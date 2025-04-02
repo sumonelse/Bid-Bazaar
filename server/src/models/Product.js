@@ -21,17 +21,18 @@ const productSchema = new mongoose.Schema({
         },
     },
     sellerId: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User ",
         required: true,
     },
     categoryId: {
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Category",
         required: true,
     },
     condition: {
         type: String,
+        enum: ["new", "used", "refurbished"], // Added condition options
     },
     status: {
         type: String,
