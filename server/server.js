@@ -13,6 +13,7 @@ import setupSocket from "./src/sockets/bidSocket.js"
 import authRoutes from "./src/routes/authRoutes.js"
 import productRoutes from "./src/routes/productRoutes.js"
 import notificationRoutes from "./src/routes/notificationRoutes.js"
+import categoryRoutes from "./src/routes/categoryRoutes.js"
 
 // Load environment variables
 dotenv.config()
@@ -37,6 +38,7 @@ app.use(morgan("combined")) // Logging
 app.use("/api/auth", authRoutes) // Authentication routes
 app.use("/api/products", productRoutes) // Product-related routes
 app.use("/api/notifications", notificationRoutes) // Notificaiton-related routes
+app.use("/api/categories", categoryRoutes) // Category-related routes
 
 // Fallback route for undefined endpoints
 app.use((req, res, next) => {
