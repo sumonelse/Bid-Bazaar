@@ -4,7 +4,7 @@ import bcrypt from "bcrypt"
 // Email validation regex
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const UserSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
     {
         username: {
             type: String,
@@ -64,8 +64,11 @@ const UserSchema = new mongoose.Schema(
     { timestamps: true }
 )
 
+// Index for faster searches
+userSchema.index({ username: 1 })
+
 // Hash password before saving
-UserSchema.pre("save", async function (next) {
+userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next()
     try {
         this.password = await bcrypt.hash(this.password, 10)
@@ -76,10 +79,10 @@ UserSchema.pre("save", async function (next) {
 })
 
 // Compare password
-UserSchema.methods.comparePassword = async function (enteredPassword) {
+userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password)
 }
 
 // Create the User model
-const User = mongoose.model("User ", UserSchema)
+const User = mongoose.model("User ", userSchema)
 export default User

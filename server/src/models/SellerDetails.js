@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 
-const SellerDetailsSchema = new mongoose.Schema(
+const sellerDetailsSchema = new mongoose.Schema(
     {
         user: {
             type: mongoose.Schema.Types.ObjectId,
@@ -24,5 +24,5 @@ const SellerDetailsSchema = new mongoose.Schema(
     { timestamps: true }
 )
 
-const SellerDetails = mongoose.model("SellerDetails", SellerDetailsSchema)
+const SellerDetails = mongoose.model("SellerDetails", sellerDetailsSchema)
 export default SellerDetails
