@@ -53,3 +53,27 @@ export const verifyToken = async (req, res, next) => {
         )
     }
 }
+
+// Check if user is the seller
+exports.isSeller = async (req, res, next) => {
+    try {
+        const product = await require("../models/product.model").findById(
+            req.params.id
+        )
+
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" })
+        }
+
+        if (product.sellerId.toString() !== req.user.id) {
+            return res
+                .status(403)
+                .json({ message: "Not authorized to perform this action" })
+        }
+
+        next()
+    } catch (error) {
+        console.error("isSeller middleware error:", error)
+        res.status(500).json({ message: "Server error" })
+    }
+}

@@ -40,8 +40,26 @@ const UserSchema = new mongoose.Schema(
         },
         avatar: {
             type: String,
-            default: "https://example.com/default-avatar.png", // Use a default avatar URL
+            default: "",
         },
+        watchlist: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
+            },
+        ],
+        wins: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
+            },
+        ],
+        listings: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Product",
+            },
+        ],
     },
     { timestamps: true }
 )
@@ -59,8 +77,6 @@ UserSchema.pre("save", async function (next) {
 
 // Compare password
 UserSchema.methods.comparePassword = async function (enteredPassword) {
-    console.log("Entered Password:", enteredPassword)
-    console.log("Stored Password:", this.password)
     return await bcrypt.compare(enteredPassword, this.password)
 }
 
