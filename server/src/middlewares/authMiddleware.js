@@ -45,6 +45,24 @@ export const verifyToken = async (req, res, next) => {
     }
 }
 
+// Admin authorization middleware
+export const isAdmin = (req, res, next) => {
+    const apiResponse = new ApiResponse(res)
+    try {
+        if (req.user && req.user.role === "admin") {
+            next()
+        } else {
+            return apiResponse.error(
+                "Access denied: Admin privileges required",
+                500
+            )
+        }
+    } catch (error) {
+        console.error("isAdmin middleware error:", error)
+        return apiResponse.error("Server error", 500)
+    }
+}
+
 // Check if user is the seller
 export const isSeller = async (req, res, next) => {
     const apiResponse = new ApiResponse(res)
