@@ -1,0 +1,69 @@
+import mongoose from "mongoose"
+import bcrypt from "bcrypt"
+
+// Email validation regex
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const UserSchema = new mongoose.Schema(
+    {
+        username: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true,
+            minlength: 3,
+            maxlength: 20,
+        },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            trim: true,
+            lowercase: true,
+            validate: {
+                validator: function (v) {
+                    return emailRegex.test(v)
+                },
+                message: (props) => `${props.value} is not a valid email!`,
+            },
+        },
+        password: {
+            type: String,
+            required: true,
+            minlength: 6,
+            select: false,
+        },
+        role: {
+            type: String,
+            enum: ["user", "seller"],
+            default: "user",
+        },
+        avatar: {
+            type: String,
+            default: "https://example.com/default-avatar.png", // Use a default avatar URL
+        },
+    },
+    { timestamps: true }
+)
+
+// Hash password before saving
+UserSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next()
+    try {
+        this.password = await bcrypt.hash(this.password, 10)
+        next()
+    } catch (error) {
+        next(error) // Pass the error to the next middleware
+    }
+})
+
+// Compare password
+UserSchema.methods.comparePassword = async function (enteredPassword) {
+    console.log("Entered Password:", enteredPassword)
+    console.log("Stored Password:", this.password)
+    return await bcrypt.compare(enteredPassword, this.password)
+}
+
+// Create the User model
+const User = mongoose.model("User ", UserSchema)
+export default User
