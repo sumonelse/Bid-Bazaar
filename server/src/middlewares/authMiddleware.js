@@ -73,7 +73,7 @@ export const isSeller = async (req, res, next) => {
             return apiResponse.error("Product not found", 404)
         }
 
-        if (product.sellerId.toString() !== req.user.id) {
+        if (product.sellerId.toString() !== req.user._id.toString()) {
             return apiResponse.error(
                 "Not authorized to perform this action",
                 403

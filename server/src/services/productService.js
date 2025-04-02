@@ -16,7 +16,6 @@ class ProductService {
             const product = new Product({
                 ...productData,
                 sellerId: userId,
-                categoryName: category.name,
             })
 
             await product.save()
@@ -130,7 +129,7 @@ class ProductService {
                 throw new Error("Product not found")
             }
 
-            if (product.sellerId.toString() !== userId) {
+            if (product.sellerId.toString() !== userId.toString()) {
                 throw new Error("Not authorized to update this product")
             }
 
@@ -168,7 +167,7 @@ class ProductService {
                 throw new Error("Product not found")
             }
 
-            if (product.sellerId.toString() !== userId) {
+            if (product.sellerId.toString() !== userId.toString()) {
                 throw new Error(" Not authorized to delete this product")
             }
 
