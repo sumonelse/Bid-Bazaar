@@ -8,15 +8,15 @@ const userSchema = new mongoose.Schema(
     {
         username: {
             type: String,
-            required: true,
+            required: [true, "Username is required"],
             unique: true,
             trim: true,
-            minlength: 3,
-            maxlength: 20,
+            minlength: [3, "Username must be at least 3 characters long"],
+            maxlength: [20, "Username cannot exceed 20 characters"],
         },
         email: {
             type: String,
-            required: true,
+            required: [true, "Email is required"],
             unique: true,
             trim: true,
             lowercase: true,
@@ -29,9 +29,9 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: true,
-            minlength: 6,
-            select: false,
+            required: [true, "Password is required"],
+            minlength: [6, "Password must be at least 6 characters long"],
+            select: false, // Exclude password from query results by default
         },
         role: {
             type: String,
@@ -66,6 +66,7 @@ const userSchema = new mongoose.Schema(
 
 // Index for faster searches
 userSchema.index({ username: 1 })
+userSchema.index({ email: 1 })
 
 // Hash password before saving
 userSchema.pre("save", async function (next) {
@@ -83,6 +84,11 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password)
 }
 
+// Static method to find users by role
+userSchema.statics.findByRole = async function (role) {
+    return this.find({ role })
+}
+
 // Create the User model
-const User = mongoose.model("User ", userSchema)
+const User = mongoose.model("User", userSchema)
 export default User
