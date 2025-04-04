@@ -1,0 +1,112 @@
+/* Responsive Utilities */
+
+/* Improved container padding for small screens */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Better text sizing for mobile */
+@media (max-width: 640px) {
+    h1 {
+        font-size: 1.75rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    h3 {
+        font-size: 1.25rem !important;
+    }
+
+    p {
+        font-size: 0.9375rem !important;
+    }
+}
+
+/* Improved spacing for mobile */
+@media (max-width: 640px) {
+    .section {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Better button sizing for mobile */
+@media (max-width: 640px) {
+    .btn,
+    button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9375rem;
+    }
+}
+
+/* Improved form elements for mobile */
+@media (max-width: 640px) {
+    input,
+    select,
+    textarea {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Improved card hover effects */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Improved focus styles for accessibility */
+:focus {
+    outline: 2px solid rgba(99, 102, 241, 0.6);
+    outline-offset: 2px;
+}
+
+/* Improved tap target sizes for mobile */
+@media (max-width: 640px) {
+    button,
+    .btn,
+    a.btn,
+    input[type="submit"],
+    input[type="button"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}

@@ -77,32 +77,30 @@ const LoginPage = () => {
                     >
                         <div>
                             <label
-                                htmlFor="email"
+                                htmlFor="emailOrUsername"
                                 className="block text-sm font-medium text-gray-700"
                             >
-                                Email address
+                                Email or Username
                             </label>
                             <div className="mt-1">
                                 <input
-                                    id="email"
-                                    type="email"
-                                    autoComplete="email"
+                                    id="emailOrUsername"
+                                    type="text"
+                                    autoComplete="email username"
                                     className={`appearance-none block w-full px-3 py-2 border ${
-                                        errors.email
+                                        errors.emailOrUsername
                                             ? "border-red-300"
                                             : "border-gray-300"
                                     } rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm`}
-                                    {...register("email", {
-                                        required: "Email is required",
-                                        pattern: {
-                                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                            message: "Invalid email address",
-                                        },
+                                    placeholder="Enter your email or username"
+                                    {...register("emailOrUsername", {
+                                        required:
+                                            "Email or username is required",
                                     })}
                                 />
-                                {errors.email && (
+                                {errors.emailOrUsername && (
                                     <p className="mt-1 text-sm text-red-600">
-                                        {errors.email.message}
+                                        {errors.emailOrUsername.message}
                                     </p>
                                 )}
                             </div>

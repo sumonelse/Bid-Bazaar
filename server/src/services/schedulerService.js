@@ -3,6 +3,7 @@ import Product from "../models/Product.js"
 import User from "../models/User.js"
 import Bid from "../models/Bid.js"
 import notificationService from "./notificationService.js"
+import emailService from "./emailService.js"
 import { getIO } from "../sockets/bidSocket.js"
 
 class SchedulerService {
@@ -69,8 +70,9 @@ class SchedulerService {
                     ]),
                 ]
 
-                // Send notifications
+                // Send in-app notifications and emails
                 for (const userId of userIds) {
+                    // Create in-app notification
                     await notificationService.createNotification({
                         userId,
                         type: "endingSoon",
@@ -81,6 +83,23 @@ class SchedulerService {
                         )} left.`,
                         productId: auction._id,
                     })
+
+                    // Send email notification
+                    try {
+                        const user = await User.findById(userId)
+                        if (user && user.email) {
+                            await emailService.sendAuctionEndingSoonEmail(
+                                user,
+                                auction
+                            )
+                        }
+                    } catch (emailError) {
+                        console.error(
+                            "Error sending ending soon email:",
+                            emailError
+                        )
+                        // Continue even if email fails
+                    }
                 }
 
                 // Mark as notified
@@ -130,7 +149,7 @@ class SchedulerService {
                     .populate("userId", "name email")
 
                 if (winningBid) {
-                    // Notify the winner
+                    // Notify the winner with in-app notification
                     await notificationService.createNotification({
                         userId: winningBid.userId._id,
                         type: "auctionWon",
@@ -139,6 +158,20 @@ class SchedulerService {
                         }" with a bid of $${winningBid.amount.toFixed(2)}.`,
                         productId: auction._id,
                     })
+
+                    // Send email notification to winner
+                    try {
+                        await emailService.sendAuctionWonEmail(
+                            winningBid.userId,
+                            auction
+                        )
+                    } catch (emailError) {
+                        console.error(
+                            "Error sending auction won email:",
+                            emailError
+                        )
+                        // Continue even if email fails
+                    }
 
                     // Notify the seller
                     await notificationService.createNotification({
@@ -261,11 +294,27 @@ class SchedulerService {
                         }.`
                     }
 
+                    // Create in-app notification
                     await notificationService.createNotification({
                         userId: user._id,
                         type: "digest",
                         message,
                     })
+
+                    // Send email digest
+                    try {
+                        await emailService.sendDailyDigestEmail(user, {
+                            activeBids,
+                            watchlistEndingSoon,
+                            activeListings,
+                        })
+                    } catch (emailError) {
+                        console.error(
+                            "Error sending daily digest email:",
+                            emailError
+                        )
+                        // Continue even if email fails
+                    }
                 }
             }
         } catch (error) {

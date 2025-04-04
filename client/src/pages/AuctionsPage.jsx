@@ -170,10 +170,10 @@ const AuctionsPage = () => {
     const totalPages = Math.ceil(totalProducts / productsPerPage)
 
     return (
-        <div className="bg-gray-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="bg-gray-50 min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
-                <div className="mb-10">
-                    <h1 className="text-4xl font-bold text-gray-900 relative inline-block">
+                <div className="mb-6 sm:mb-10">
+                    <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 relative inline-block">
                         <span className="relative z-10">
                             {debouncedSearchQuery
                                 ? `Search Results for "${debouncedSearchQuery}"`
@@ -187,13 +187,23 @@ const AuctionsPage = () => {
                     </p>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-10">
-                    {/* Filters sidebar */}
-                    <div className="w-full md:w-72 flex-shrink-0">
-                        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 sticky top-24">
-                            <h2 className="text-xl font-semibold text-gray-900 mb-6 pb-3 border-b border-gray-200">
-                                Filters
-                            </h2>
+                <div className="lg:flex lg:flex-row gap-6 lg:gap-10">
+                    {/* Filters sidebar - collapsible on mobile */}
+                    <div className="w-full lg:w-72 flex-shrink-0 mb-6 lg:mb-0">
+                        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 border border-gray-100 lg:sticky lg:top-24">
+                            <div className="flex justify-between items-center lg:block">
+                                <h2 className="text-xl font-semibold text-gray-900 mb-2 lg:mb-6 lg:pb-3 lg:border-b lg:border-gray-200">
+                                    Filters
+                                </h2>
+                                <button className="lg:hidden text-primary-600 font-medium">
+                                    {filters.categories.length > 0 ||
+                                    filters.price.min !== undefined ||
+                                    filters.price.max !== undefined ||
+                                    filters.status !== "all"
+                                        ? "Clear All"
+                                        : ""}
+                                </button>
+                            </div>
                             <ProductFilters
                                 initialFilters={filters}
                                 onFilterChange={handleFilterChange}

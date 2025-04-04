@@ -48,6 +48,14 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: "",
         },
+        resetPasswordToken: {
+            type: String,
+            default: null,
+        },
+        resetPasswordExpires: {
+            type: Date,
+            default: null,
+        },
         watchlist: [
             {
                 type: mongoose.Schema.Types.ObjectId,
@@ -66,6 +74,103 @@ const userSchema = new mongoose.Schema(
                 ref: "Product",
             },
         ],
+        // Gamification fields
+        level: {
+            type: Number,
+            default: 1,
+            min: 1,
+        },
+        experience: {
+            type: Number,
+            default: 0,
+            min: 0,
+        },
+        reputation: {
+            type: Number,
+            default: 0,
+        },
+        coins: {
+            type: Number,
+            default: 100,
+            min: 0,
+        },
+        streak: {
+            count: {
+                type: Number,
+                default: 0,
+            },
+            lastActive: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+        stats: {
+            bidsPlaced: {
+                type: Number,
+                default: 0,
+            },
+            auctionsWon: {
+                type: Number,
+                default: 0,
+            },
+            auctionsCreated: {
+                type: Number,
+                default: 0,
+            },
+            auctionsSold: {
+                type: Number,
+                default: 0,
+            },
+            totalSpent: {
+                type: Number,
+                default: 0,
+            },
+            totalEarned: {
+                type: Number,
+                default: 0,
+            },
+            highestBid: {
+                type: Number,
+                default: 0,
+            },
+            outbidRecoveries: {
+                type: Number,
+                default: 0,
+            },
+            perfectFeedbacks: {
+                type: Number,
+                default: 0,
+            },
+            referrals: {
+                type: Number,
+                default: 0,
+            },
+        },
+        preferences: {
+            displayTitle: {
+                type: String,
+                default: "Novice Bidder",
+            },
+            selectedBadges: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Badge",
+                    max: 3,
+                },
+            ],
+            notifyOnAchievements: {
+                type: Boolean,
+                default: true,
+            },
+            showLevelProgress: {
+                type: Boolean,
+                default: true,
+            },
+            showInLeaderboards: {
+                type: Boolean,
+                default: true,
+            },
+        },
     },
     { timestamps: true }
 )

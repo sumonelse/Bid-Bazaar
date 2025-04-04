@@ -37,12 +37,12 @@ const ProductCard = ({ product }) => {
     }
 
     return (
-        <div className="card group hover:scale-[1.02] transition-transform duration-300 hover:shadow-xl border border-gray-100">
+        <div className="card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl border border-gray-100 rounded-xl overflow-hidden bg-white h-full">
             <Link
                 to={`/product/${product._id || "not-found"}`}
-                className="block"
+                className="h-full flex flex-col"
             >
-                <div className="relative pb-[75%] overflow-hidden rounded-lg mb-4">
+                <div className="relative pb-[85%] overflow-hidden mb-0 rounded-xl">
                     <img
                         src={
                             product.images && product.images.length > 0
@@ -66,11 +66,11 @@ const ProductCard = ({ product }) => {
 
                     {/* Status badge */}
                     {isComplete ? (
-                        <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                        <div className="absolute top-3 left-3 bg-danger-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                             Ended
                         </div>
                     ) : (
-                        <div className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                        <div className="absolute top-3 left-3 bg-success-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                             Active
                         </div>
                     )}
@@ -83,13 +83,13 @@ const ProductCard = ({ product }) => {
                     </div>
                 </div>
 
-                <div className="px-1">
-                    <h3 className="text-lg font-semibold text-gray-800 line-clamp-1 group-hover:text-primary-600 transition-colors duration-200">
+                <div className="p-2 flex-grow flex flex-col">
+                    <h3 className="text-xl font-semibold text-gray-800 line-clamp-1 group-hover:text-primary-600 transition-colors duration-200 mb-2">
                         {product.title || "Untitled Product"}
                     </h3>
-                    <div className="flex justify-between items-center mt-3">
+                    <div className="flex justify-between items-center mt-auto">
                         <div>
-                            <p className="text-primary-600 font-bold text-lg">
+                            <p className="text-primary-600 font-bold text-xl">
                                 $
                                 {product.currentBid !== undefined &&
                                 product.currentBid !== null
@@ -99,10 +99,11 @@ const ProductCard = ({ product }) => {
                                     ? product.startingPrice.toFixed(2)
                                     : "0.00"}
                             </p>
-                            <p className="text-xs text-gray-500 font-medium">
-                                {product.bids && Array.isArray(product.bids)
-                                    ? product.bids.length
-                                    : 0}{" "}
+                            <p className="text-sm text-gray-500 font-medium">
+                                {product.bidCount ||
+                                    (product.bids && Array.isArray(product.bids)
+                                        ? product.bids.length
+                                        : 0)}{" "}
                                 bids
                             </p>
                         </div>
@@ -111,7 +112,7 @@ const ProductCard = ({ product }) => {
                             <div
                                 className={`flex items-center text-sm font-medium px-3 py-1 rounded-full ${
                                     days === 0 && hours < 5
-                                        ? "bg-red-100 text-red-600"
+                                        ? "bg-danger-100 text-danger-600"
                                         : "bg-gray-100 text-gray-600"
                                 }`}
                             >

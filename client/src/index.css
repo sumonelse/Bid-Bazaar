@@ -44,7 +44,7 @@
     }
 
     .card {
-        @apply bg-white rounded-lg shadow-card p-6 transition-shadow duration-300 hover:shadow-card-hover;
+        @apply bg-white rounded-lg shadow-card p-2 transition-shadow duration-300 hover:shadow-card-hover;
     }
 
     .form-input {

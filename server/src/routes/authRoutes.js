@@ -13,4 +13,8 @@ router.post("/login", authController.login)
 // Get current user (protected route)
 router.get("/me", verifyToken, authController.getCurrentUser)
 
+// Password reset routes
+router.post("/forgot-password", authController.forgotPassword)
+router.post("/reset-password", authController.resetPassword)
+
 export default router

@@ -3,12 +3,23 @@ import ProductCard from "./ProductCard"
 const ProductGrid = ({ products, loading, error }) => {
     if (loading) {
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8">
                 {[...Array(8)].map((_, index) => (
-                    <div key={index} className="card animate-pulse">
-                        <div className="bg-gray-300 rounded-lg h-48 mb-4"></div>
-                        <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                        <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                    <div
+                        key={index}
+                        className="card animate-pulse bg-white rounded-xl overflow-hidden h-full"
+                    >
+                        <div className="bg-gray-200 h-56 mb-4"></div>
+                        <div className="p-5">
+                            <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+                            <div className="flex justify-between">
+                                <div>
+                                    <div className="h-7 bg-gray-200 rounded w-24 mb-2"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-16"></div>
+                                </div>
+                                <div className="h-8 bg-gray-200 rounded-full w-28"></div>
+                            </div>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -42,7 +53,7 @@ const ProductGrid = ({ products, loading, error }) => {
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 sm:gap-8">
             {products.map((product) => (
                 <ProductCard key={product._id} product={product} />
             ))}

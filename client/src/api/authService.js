@@ -23,7 +23,23 @@ export const register = async (userData) => {
 // Login user
 export const login = async (credentials) => {
     try {
-        const response = await api.post("/auth/login", credentials)
+        // Transform credentials to match the server's expected format
+        const loginData = {}
+
+        // Check if the input is an email or username
+        if (credentials.emailOrUsername) {
+            const isEmail = credentials.emailOrUsername.includes("@")
+            if (isEmail) {
+                loginData.email = credentials.emailOrUsername
+            } else {
+                loginData.username = credentials.emailOrUsername
+            }
+        }
+
+        // Add password
+        loginData.password = credentials.password
+
+        const response = await api.post("/auth/login", loginData)
         const { token, user } = response.data.data
 
         // Store token and user data in localStorage
@@ -32,6 +48,9 @@ export const login = async (credentials) => {
 
         return { token, user }
     } catch (error) {
+        // Log detailed error information for debugging
+        console.error("Login error details:", error.response?.data)
+
         // Extract the error message from the response
         const errorMessage =
             error.response?.data?.message || "Invalid credentials"

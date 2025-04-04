@@ -58,10 +58,17 @@ export const AuthProvider = ({ children }) => {
         setError(null)
         try {
             const { user } = await loginService(credentials)
+
+            // Make sure we have a valid user object
+            if (!user || typeof user !== "object") {
+                throw new Error("Invalid user data received from server")
+            }
+
             setCurrentUser(user)
             setIsAuthenticated(true)
             return user
         } catch (err) {
+            console.error("Login error in AuthContext:", err)
             const errorMessage = err.message || "Login failed"
             setError(errorMessage)
             throw new Error(errorMessage)

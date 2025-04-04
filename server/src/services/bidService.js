@@ -3,6 +3,7 @@ import Product from "../models/Product.js"
 import User from "../models/User.js"
 import notificationService from "../services/notificationService.js"
 import { getIO } from "../sockets/bidSocket.js"
+import gamificationService from "./gamificationService.js"
 
 class BidService {
     // Place a bid
@@ -91,6 +92,22 @@ class BidService {
             await User.findByIdAndUpdate(userId, {
                 $push: { bidHistory: bid._id },
             })
+
+            // Track bid for gamification
+            await gamificationService.trackUserAction(userId, "bid_placed")
+
+            // Award experience points for placing a bid
+            await gamificationService.awardExperience(
+                userId,
+                5,
+                "placing a bid"
+            )
+
+            // If this is the highest bid ever placed by this user, update that stat
+            await User.findOneAndUpdate(
+                { _id: userId, "stats.highestBid": { $lt: amount } },
+                { "stats.highestBid": amount }
+            )
 
             // Handle outbid notifications
             await this._handleOutbidNotifications(

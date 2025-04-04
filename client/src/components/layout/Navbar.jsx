@@ -2,7 +2,10 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../../context/AuthContext"
 import { useNotifications } from "../../context/NotificationContext"
+import { useGamification } from "../../context/GamificationContext"
 import NotificationDropdown from "../notifications/NotificationDropdown"
+import UserLevel from "../gamification/UserLevel"
+import UserCoins from "../gamification/UserCoins"
 import {
     Bars3Icon,
     XMarkIcon,
@@ -10,6 +13,7 @@ import {
     UserCircleIcon,
     ShoppingBagIcon,
     MagnifyingGlassIcon,
+    TrophyIcon,
 } from "@heroicons/react/24/outline"
 
 const Navbar = () => {
@@ -17,12 +21,13 @@ const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState("")
     const { isAuthenticated, currentUser, logout } = useAuth()
     const { unreadCount } = useNotifications()
+    const { profile } = useGamification()
     const navigate = useNavigate()
 
     const handleSearch = (e) => {
         e.preventDefault()
         if (searchQuery.trim()) {
-            navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+            navigate(`/auctions?q=${encodeURIComponent(searchQuery.trim())}`)
             setSearchQuery("")
         }
     }
@@ -42,7 +47,7 @@ const Navbar = () => {
                         <div className="flex-shrink-0 flex items-center">
                             <Link to="/" className="flex items-center">
                                 <ShoppingBagIcon className="h-8 w-8 text-primary-600" />
-                                <span className="ml-2 text-xl font-heading font-bold text-gray-900">
+                                <span className="ml-2 text-xl font-heading font-bold text-gray-900 hidden sm:inline">
                                     BidBazaar
                                 </span>
                             </Link>
@@ -88,7 +93,7 @@ const Navbar = () => {
                                 <input
                                     type="text"
                                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                    placeholder="Search products..."
+                                    placeholder="Search..."
                                     value={searchQuery}
                                     onChange={(e) =>
                                         setSearchQuery(e.target.value)
@@ -102,6 +107,14 @@ const Navbar = () => {
                     <div className="hidden sm:ml-6 sm:flex sm:items-center">
                         {isAuthenticated ? (
                             <>
+                                {/* Simplified Gamification Element */}
+                                <Link
+                                    to="/achievements"
+                                    className="flex items-center mr-2 bg-primary-50 rounded-full px-2 py-1 shadow-sm hover:bg-primary-100 transition-colors"
+                                >
+                                    <TrophyIcon className="h-5 w-5 text-accent-500 group-hover:text-accent-600 transition-colors" />
+                                </Link>
+
                                 {/* Notifications Dropdown */}
                                 <NotificationDropdown />
 
@@ -110,18 +123,16 @@ const Navbar = () => {
                                     <div>
                                         <button
                                             type="button"
-                                            className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                            className="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 border-2 border-primary-200 p-0.5 hover:border-primary-300 transition-colors"
                                             id="user-menu-button"
                                         >
                                             <span className="sr-only">
                                                 Open user menu
                                             </span>
-                                            {currentUser?.profileImage ? (
+                                            {currentUser?.avatar ? (
                                                 <img
                                                     className="h-8 w-8 rounded-full object-cover"
-                                                    src={
-                                                        currentUser.profileImage
-                                                    }
+                                                    src={currentUser.avatar}
                                                     alt={currentUser.name}
                                                 />
                                             ) : (
@@ -129,34 +140,40 @@ const Navbar = () => {
                                             )}
                                         </button>
                                     </div>
-                                    <div className="hidden group-hover:block absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                                    <div className="hidden group-hover:block absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10 transform transition-all duration-200 origin-top-right">
                                         <Link
                                             to="/dashboard"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                         >
                                             Dashboard
                                         </Link>
                                         <Link
                                             to="/profile"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                         >
                                             Profile
                                         </Link>
                                         <Link
+                                            to="/achievements"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+                                        >
+                                            Achievements & Badges
+                                        </Link>
+                                        <Link
                                             to="/my-bids"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                         >
                                             My Bids
                                         </Link>
                                         <Link
                                             to="/my-listings"
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                         >
                                             My Listings
                                         </Link>
                                         <button
                                             onClick={handleLogout}
-                                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            className="block w-full text-left px-4 py-2 text-sm text-danger-700 hover:bg-danger-50 transition-colors font-medium"
                                         >
                                             Sign out
                                         </button>
@@ -210,28 +227,28 @@ const Navbar = () => {
                     <div className="pt-2 pb-3 space-y-1">
                         <Link
                             to="/"
-                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-500 hover:text-gray-800"
+                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-primary-50 hover:border-primary-500 hover:text-primary-700 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Home
                         </Link>
                         <Link
                             to="/categories"
-                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-500 hover:text-gray-800"
+                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-primary-50 hover:border-primary-500 hover:text-primary-700 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Categories
                         </Link>
                         <Link
                             to="/auctions"
-                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-500 hover:text-gray-800"
+                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-primary-50 hover:border-primary-500 hover:text-primary-700 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Auctions
                         </Link>
                         <Link
                             to="/about"
-                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-500 hover:text-gray-800"
+                            className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-primary-50 hover:border-primary-500 hover:text-primary-700 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             About
@@ -292,6 +309,13 @@ const Navbar = () => {
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Profile
+                                </Link>
+                                <Link
+                                    to="/achievements"
+                                    className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Achievements & Badges
                                 </Link>
                                 <Link
                                     to="/my-bids"

@@ -1,15 +1,23 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useBidding } from "../../context/BidContext"
-import { ArrowTrendingUpIcon } from "@heroicons/react/24/outline"
+import { useGamification } from "../../context/GamificationContext"
+import {
+    ArrowTrendingUpIcon,
+    CheckCircleIcon,
+} from "@heroicons/react/24/outline"
+import { CheckCircleIcon as CheckCircleSolidIcon } from "@heroicons/react/24/solid"
 
 const BidForm = ({ product, onBidPlaced }) => {
     const [bidAmount, setBidAmount] = useState("")
     const [error, setError] = useState("")
+    const [success, setSuccess] = useState(false)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [suggestedBids, setSuggestedBids] = useState([])
+    const [bidPlaced, setBidPlaced] = useState(null)
     const { isAuthenticated } = useAuth()
     const { placeBid } = useBidding()
+    const { profile } = useGamification()
 
     // Calculate minimum bid amount (current bid + minimum increment)
     const minBidAmount = product.currentBid
@@ -41,11 +49,12 @@ const BidForm = ({ product, onBidPlaced }) => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError("")
+        setSuccess(false)
 
         // Validate bid amount
         const amount = parseFloat(bidAmount)
         if (isNaN(amount) || amount < minBidAmount) {
-            setError(`Bid must be at least $${minBidAmount.toFixed(2)}`)
+            setError(`Bid must be at least ₹${minBidAmount.toFixed(2)}`)
             return
         }
 
@@ -53,6 +62,14 @@ const BidForm = ({ product, onBidPlaced }) => {
             setIsSubmitting(true)
             await placeBid(product._id, amount)
             setBidAmount("")
+            setBidPlaced(amount)
+            setSuccess(true)
+
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                setSuccess(false)
+            }, 5000)
+
             if (onBidPlaced) onBidPlaced(amount)
         } catch (err) {
             setError(err.message || "Failed to place bid. Please try again.")
@@ -105,7 +122,7 @@ const BidForm = ({ product, onBidPlaced }) => {
                 <p className="text-sm text-gray-500">
                     Current bid:{" "}
                     <span className="font-semibold text-gray-800">
-                        $
+                        ₹
                         {(product.currentBid || product.startingPrice).toFixed(
                             2
                         )}
@@ -114,7 +131,7 @@ const BidForm = ({ product, onBidPlaced }) => {
                 <p className="text-sm text-gray-500">
                     Minimum bid:{" "}
                     <span className="font-semibold text-gray-800">
-                        ${minBidAmount.toFixed(2)}
+                        ₹{minBidAmount.toFixed(2)}
                     </span>
                 </p>
             </div>
@@ -130,11 +147,30 @@ const BidForm = ({ product, onBidPlaced }) => {
                             onClick={() => handleSuggestedBid(amount)}
                             className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full transition-colors"
                         >
-                            ${amount.toFixed(2)}
+                            ₹{amount.toFixed(2)}
                         </button>
                     ))}
                 </div>
             </div>
+
+            {/* Success message */}
+            {success && (
+                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md flex items-start">
+                    <CheckCircleSolidIcon className="h-5 w-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
+                    <div>
+                        <p className="text-sm font-medium text-green-800">
+                            Bid placed successfully!
+                        </p>
+                        <p className="text-xs text-green-700 mt-1">
+                            Your bid of ₹{bidPlaced?.toFixed(2)} has been
+                            placed.{" "}
+                            {profile && profile.level && (
+                                <span>You earned 5 XP for bidding!</span>
+                            )}
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Bid form */}
             <form onSubmit={handleSubmit}>
@@ -144,7 +180,7 @@ const BidForm = ({ product, onBidPlaced }) => {
                     </label>
                     <div className="relative rounded-md shadow-sm">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span className="text-gray-500 sm:text-sm">$</span>
+                            <span className="text-gray-500 sm:text-sm">₹</span>
                         </div>
                         <input
                             type="number"
@@ -153,8 +189,15 @@ const BidForm = ({ product, onBidPlaced }) => {
                             step="0.01"
                             min={minBidAmount}
                             value={bidAmount}
-                            onChange={(e) => setBidAmount(e.target.value)}
-                            className="form-input pl-7 block w-full sm:text-sm border-gray-300 rounded-md"
+                            onChange={(e) => {
+                                setBidAmount(e.target.value)
+                                setError("")
+                            }}
+                            className={`form-input pl-7 block w-full sm:text-sm rounded-md ${
+                                error
+                                    ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                                    : "border-gray-300"
+                            }`}
                             placeholder={`${minBidAmount.toFixed(2)} or more`}
                             required
                         />

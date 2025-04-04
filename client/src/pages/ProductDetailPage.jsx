@@ -312,10 +312,10 @@ const ProductDetailPage = () => {
                                 Current bid:
                             </div>
                             <div className="text-3xl font-bold text-primary-600">
-                                ${currentBid?.toFixed(2)}
+                                ₹{currentBid?.toFixed(2)}
                             </div>
                             <div className="text-sm text-gray-500 mt-1">
-                                Started at $
+                                Started at ₹
                                 {product.startingPrice?.toFixed(2) || "0.00"}
                             </div>
                         </div>

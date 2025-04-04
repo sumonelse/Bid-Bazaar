@@ -17,6 +17,7 @@ import notificationRoutes from "./src/routes/notificationRoutes.js"
 import categoryRoutes from "./src/routes/categoryRoutes.js"
 import bidRoutes from "./src/routes/bidRoutes.js"
 import userRoutes from "./src/routes/userRoutes.js"
+import gamificationRoutes from "./src/routes/gamificationRoutes.js"
 
 // Load environment variables
 dotenv.config()
@@ -43,10 +44,11 @@ app.use(morgan("combined")) // Logging
 // API Routes
 app.use("/api/auth", authRoutes) // Authentication routes
 app.use("/api/products", productRoutes) // Product-related routes
-app.use("/api/notifications", notificationRoutes) // Notificaiton-related routes
+app.use("/api/notifications", notificationRoutes) // Notification-related routes
 app.use("/api/categories", categoryRoutes) // Category-related routes
 app.use("/api/bids", bidRoutes) // Bid-related routes
 app.use("/api/user", userRoutes) // User-related routes
+app.use("/api/gamification", gamificationRoutes) // Gamification-related routes
 
 // Fallback route for undefined endpoints
 app.use((req, res, next) => {
