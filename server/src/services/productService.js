@@ -15,6 +15,7 @@ class ProductService {
 
             const product = new Product({
                 ...productData,
+                category: productData.categoryId, // Use the new field name
                 sellerId: userId,
             })
 
@@ -41,7 +42,8 @@ class ProductService {
                 .sort(this.getSortOrder(filters.sortBy))
                 .skip(skip)
                 .limit(limit)
-                .populate("categoryId", "name icon")
+                .populate("category", "name icon")
+                .populate("sellerId", "name avatar")
 
             const total = await Product.countDocuments(query)
 
@@ -52,6 +54,7 @@ class ProductService {
                 total,
             }
         } catch (error) {
+            console.error("Get products error details:", error)
             throw new Error(`Failed to get products: ${error.message}`)
         }
     }
@@ -59,9 +62,8 @@ class ProductService {
     // Helper method to build product query
     buildProductQuery(filters) {
         const query = {}
-        if (filters.categoryId) query.categoryId = filters.categoryId
+        if (filters.categoryId) query.category = filters.categoryId
         if (filters.status) query.status = filters.status
-        if (filters.bidType) query.bidType = filters.bidType
         if (filters.sellerId) query.sellerId = filters.sellerId
         if (filters.minPrice) query.currentBid = { $gte: filters.minPrice }
         if (filters.maxPrice) {
@@ -69,6 +71,10 @@ class ProductService {
                 ...query.currentBid,
                 $lte: filters.maxPrice,
             }
+        }
+        // Handle search query
+        if (filters.search) {
+            query.$text = { $search: filters.search }
         }
         return query
     }
@@ -106,10 +112,9 @@ class ProductService {
     // Get product by ID
     async getProductById(productId) {
         try {
-            const product = await Product.findById(productId).populate(
-                "sellerId",
-                "name email avatar"
-            )
+            const product = await Product.findById(productId)
+                .populate("sellerId", "name email avatar")
+                .populate("category", "name icon")
 
             if (!product) {
                 throw new Error("Product not found")
@@ -117,6 +122,7 @@ class ProductService {
 
             return product
         } catch (error) {
+            console.error("Product fetch error details:", error)
             throw new Error(`Failed to get product: ${error.message}`)
         }
     }
@@ -138,13 +144,43 @@ class ProductService {
             // Update category if categoryId is changed
             if (
                 updates.categoryId &&
-                updates.categoryId !== product.categoryId.toString()
+                updates.categoryId !== product.category.toString()
             ) {
                 const category = await Category.findById(updates.categoryId)
                 if (!category) {
                     throw new Error("Category not found")
                 }
-                allowedUpdates.categoryId = category._id
+                allowedUpdates.category = category._id
+            }
+
+            // Ensure images is an array of strings
+            if (allowedUpdates.images) {
+                if (typeof allowedUpdates.images === "string") {
+                    try {
+                        // Try to parse if it's a JSON string
+                        allowedUpdates.images = JSON.parse(
+                            allowedUpdates.images
+                        )
+                    } catch (e) {
+                        // If not a valid JSON, treat as a single image URL
+                        allowedUpdates.images = [allowedUpdates.images]
+                    }
+                }
+
+                // Ensure all items in the array are strings
+                if (Array.isArray(allowedUpdates.images)) {
+                    allowedUpdates.images = allowedUpdates.images
+                        .map((img) => {
+                            if (typeof img === "string") {
+                                return img
+                            } else if (img && img.url) {
+                                return img.url
+                            } else {
+                                return ""
+                            }
+                        })
+                        .filter((img) => img) // Remove any empty strings
+                }
             }
 
             const updatedProduct = await Product.findByIdAndUpdate(
@@ -155,6 +191,7 @@ class ProductService {
 
             return updatedProduct
         } catch (error) {
+            console.error("Product update error details:", error)
             throw new Error(`Failed to update product: ${error.message}`)
         }
     }
@@ -247,7 +284,7 @@ class ProductService {
                     { new: true }
                 )
 
-                if (product.currentBid > product.basePrice) {
+                if (product.currentBid > product.startingPrice) {
                     const highestBid = await Bid.findOne({ productId }).sort({
                         amount: -1,
                     })
@@ -279,6 +316,30 @@ class ProductService {
             return product
         } catch (error) {
             throw new Error(`Failed to check auction status: ${error.message}`)
+        }
+    }
+
+    // Get products by user ID
+    async getUserProducts(userId, page = 1, limit = 10) {
+        try {
+            const skip = (page - 1) * limit
+
+            const products = await Product.find({ sellerId: userId })
+                .populate("category", "name icon")
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+
+            const total = await Product.countDocuments({ sellerId: userId })
+
+            return {
+                products,
+                totalPages: Math.ceil(total / limit),
+                currentPage: page,
+                total,
+            }
+        } catch (error) {
+            throw new Error(`Failed to get user products: ${error.message}`)
         }
     }
 }

@@ -25,7 +25,10 @@ class CategoryController {
         const apiResponse = new ApiResponse(res)
         try {
             const categories = await categoryService.getAllCategories()
-            return apiResponse.success(categories)
+            return apiResponse.success(
+                categories,
+                "Categories retrieved successfully"
+            )
         } catch (error) {
             console.error("Get categories error:", error)
             return apiResponse.error("Server error", 500)

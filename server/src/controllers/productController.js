@@ -43,7 +43,10 @@ class ProductController {
                 numericPage,
                 numericLimit
             )
-            return apiResponse.success(result)
+            return apiResponse.success(
+                result,
+                "Products retrieved successfully"
+            )
         } catch (error) {
             console.error("Get products error:", error)
             return apiResponse.error("Server error", 500)
@@ -71,7 +74,10 @@ class ProductController {
         try {
             const product = await productService.getProductById(req.params.id)
             await productService.checkAuctionStatus(req.params.id) // Check auction status
-            return apiResponse.success(product)
+            return apiResponse.success(
+                product,
+                "Product retrieved successfully"
+            )
         } catch (error) {
             console.error("Get product error:", error)
             const statusCode = error.message === "Product not found" ? 404 : 500
@@ -154,6 +160,28 @@ class ProductController {
             console.error("Remove from watchlist error:", error)
             const statusCode = error.message === "Product not found" ? 404 : 500
             return apiResponse.error(error.message, statusCode)
+        }
+    }
+
+    // Get products by user ID
+    async getUserProducts(req, res) {
+        const apiResponse = new ApiResponse(res)
+        try {
+            const { page = 1, limit = 10 } = req.query
+            const userId = req.params.userId
+
+            const result = await productService.getUserProducts(
+                userId,
+                parseInt(page),
+                parseInt(limit)
+            )
+            return apiResponse.success(
+                result,
+                "User products retrieved successfully"
+            )
+        } catch (error) {
+            console.error("Get user products error:", error)
+            return apiResponse.error(error.message, 500)
         }
     }
 }

@@ -49,7 +49,7 @@ class CategoryService {
     // Delete category
     async deleteCategory(categoryId) {
         const productsUsingCategory = await Product.countDocuments({
-            categoryId,
+            category: categoryId,
         })
         if (productsUsingCategory > 0) {
             throw new Error(
@@ -68,7 +68,7 @@ class CategoryService {
         limit = 10,
         filters = {}
     ) {
-        const query = { categoryId }
+        const query = { category: categoryId }
 
         // Apply additional filters
         if (filters.status) query.status = filters.status

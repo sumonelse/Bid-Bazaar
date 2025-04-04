@@ -8,6 +8,7 @@ const router = express.Router()
 // Public routes
 router.get("/", productController.getProducts)
 router.get("/featured", productController.getFeaturedProducts)
+router.get("/user/:userId", productController.getUserProducts)
 router.get("/:id", productController.getProductById)
 
 // Protected routes

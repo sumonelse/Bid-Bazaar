@@ -1,10 +1,47 @@
 import Notification from "../models/Notification.js"
+import { getIO } from "../sockets/bidSocket.js"
 
 class NotificationService {
     // Create a notification
     async createNotification(notificationData) {
         try {
             const notification = await Notification.create(notificationData)
+
+            // Emit real-time notification to the user
+            try {
+                const io = getIO()
+
+                // Format notification for client
+                const formattedNotification = {
+                    _id: notification._id,
+                    type: notification.type,
+                    message: notification.message,
+                    productId: notification.productId,
+                    readStatus: notification.readStatus,
+                    timestamp: notification.timestamp,
+                }
+
+                // Send to user's personal room
+                io.to(`user:${notification.userId}`).emit(
+                    "new-notification",
+                    formattedNotification
+                )
+
+                // Also send unread count
+                const unreadCount = await Notification.countDocuments({
+                    userId: notification.userId,
+                    readStatus: false,
+                })
+
+                io.to(`user:${notification.userId}`).emit(
+                    "notification-count",
+                    { count: unreadCount }
+                )
+            } catch (socketError) {
+                console.error("Socket notification error:", socketError)
+                // Continue even if socket emission fails
+            }
+
             return notification
         } catch (error) {
             throw error
@@ -36,7 +73,7 @@ class NotificationService {
             const total = await Notification.countDocuments(query)
             const unreadCount = await Notification.countDocuments({
                 userId,
-                read: false,
+                readStatus: false,
             })
 
             return {
@@ -69,6 +106,24 @@ class NotificationService {
             notification.readStatus = true
             await notification.save()
 
+            // Emit updated unread count
+            try {
+                const io = getIO()
+
+                // Get updated unread count
+                const unreadCount = await Notification.countDocuments({
+                    userId,
+                    readStatus: false,
+                })
+
+                // Send to user's personal room
+                io.to(`user:${userId}`).emit("notification-count", {
+                    count: unreadCount,
+                })
+            } catch (socketError) {
+                console.error("Socket notification count error:", socketError)
+            }
+
             return notification
         } catch (error) {
             throw error
@@ -82,6 +137,17 @@ class NotificationService {
                 { userId, readStatus: false },
                 { $set: { readStatus: true } }
             )
+
+            // Emit updated unread count (which will be 0)
+            try {
+                const io = getIO()
+                io.to(`user:${userId}`).emit("notification-count", { count: 0 })
+
+                // Also emit a notification-update event to refresh the list
+                io.to(`user:${userId}`).emit("notifications-updated")
+            } catch (socketError) {
+                console.error("Socket notification update error:", socketError)
+            }
 
             return {
                 modifiedCount: result.modifiedCount,

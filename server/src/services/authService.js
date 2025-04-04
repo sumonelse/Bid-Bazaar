@@ -6,17 +6,35 @@ class AuthService {
     // Register a new user
     async register(userData) {
         try {
-            // Check if user already exists
-            const existingUser = await User.findOne({ email: userData.email })
-            if (existingUser) {
-                throw new Error("User  already exists")
+            // Check if user already exists by email
+            const existingUserByEmail = await User.findOne({
+                email: userData.email,
+            })
+            if (existingUserByEmail) {
+                throw new Error("User with this email already exists")
+            }
+
+            // Check if user already exists by username
+            if (userData.username) {
+                const existingUserByUsername = await User.findOne({
+                    username: userData.username,
+                })
+                if (existingUserByUsername) {
+                    throw new Error("Username is already taken")
+                }
+            } else {
+                throw new Error("Username is required")
             }
 
             // Generate avatar
             const avatar = this.generateAvatar()
 
             // Create new user
-            const user = new User({ ...userData, avatar })
+            const user = new User({
+                ...userData,
+                avatar,
+            })
+
             await user.save()
 
             // Generate JWT token
@@ -26,12 +44,14 @@ class AuthService {
                 token,
                 user: {
                     _id: user._id,
+                    name: user.name,
                     username: user.username,
                     email: user.email,
                     avatar: user.avatar,
                 },
             }
         } catch (error) {
+            console.error("Registration error:", error)
             throw error
         }
     }
@@ -63,14 +83,15 @@ class AuthService {
                 token,
                 user: {
                     _id: user._id,
+                    name: user.name,
                     username: user.username,
                     email: user.email,
                     avatar: user.avatar,
                 },
             }
         } catch (error) {
-            console.error("Login error:", error)
-            throw new Error("Login failed: " + error.message)
+            // Just pass the original error message without adding "Login failed: " prefix
+            throw error
         }
     }
 
@@ -114,7 +135,12 @@ class AuthService {
     // Generate JWT token
     generateToken(user) {
         return jwt.sign(
-            { _id: user._id, username: user.username, email: user.email },
+            {
+                _id: user._id,
+                name: user.name,
+                username: user.username,
+                email: user.email,
+            },
             config.jwtSecret,
             { expiresIn: "7d" }
         )

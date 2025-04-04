@@ -8,12 +8,15 @@ import { config } from "./src/config/config.js"
 import connectDB from "./src/config/db.js"
 import errorHandler from "./src/middlewares/errorHandler.js"
 import setupSocket from "./src/sockets/bidSocket.js"
+import schedulerService from "./src/services/schedulerService.js"
 
 // Import routes
 import authRoutes from "./src/routes/authRoutes.js"
 import productRoutes from "./src/routes/productRoutes.js"
 import notificationRoutes from "./src/routes/notificationRoutes.js"
 import categoryRoutes from "./src/routes/categoryRoutes.js"
+import bidRoutes from "./src/routes/bidRoutes.js"
+import userRoutes from "./src/routes/userRoutes.js"
 
 // Load environment variables
 dotenv.config()
@@ -28,6 +31,9 @@ setupSocket(httpServer)
 // Connect to MongoDB
 connectDB()
 
+// Initialize scheduler service
+schedulerService.initialize()
+
 // Middleware
 app.use(helmet()) // Security headers
 app.use(cors({ origin: config.clientURL || "*", credentials: true })) // CORS configuration
@@ -39,6 +45,8 @@ app.use("/api/auth", authRoutes) // Authentication routes
 app.use("/api/products", productRoutes) // Product-related routes
 app.use("/api/notifications", notificationRoutes) // Notificaiton-related routes
 app.use("/api/categories", categoryRoutes) // Category-related routes
+app.use("/api/bids", bidRoutes) // Bid-related routes
+app.use("/api/user", userRoutes) // User-related routes
 
 // Fallback route for undefined endpoints
 app.use((req, res, next) => {

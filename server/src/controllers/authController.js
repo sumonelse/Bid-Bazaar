@@ -7,15 +7,20 @@ class AuthController {
         const apiResponse = new ApiResponse(res)
         try {
             const result = await authService.register(req.body)
-            apiResponse.success(result, "User  registered successfully", 201)
+            apiResponse.success(result, "User registered successfully", 201)
         } catch (error) {
             console.error("Registration error:", error)
 
-            if (error.message === "User  already exists") {
+            // Check for specific error messages
+            if (
+                error.message.includes("already exists") ||
+                error.message.includes("is required") ||
+                error.message.includes("is already taken")
+            ) {
                 return apiResponse.error(error.message, 400)
             }
 
-            apiResponse.error("Server error", 500)
+            return apiResponse.error(error.message || "Server error", 500)
         }
     }
 
@@ -40,11 +45,16 @@ class AuthController {
         } catch (error) {
             console.error("Login error:", error)
 
-            if (error.message === "Invalid credentials") {
-                return apiResponse.error(error.message, 401)
+            // Extract the actual error message
+            const errorMessage = error.message.startsWith("Login failed: ")
+                ? error.message.substring("Login failed: ".length)
+                : error.message
+
+            if (errorMessage === "Invalid credentials") {
+                return apiResponse.error(errorMessage, 401)
             }
 
-            apiResponse.error("Server error", 500)
+            return apiResponse.error(errorMessage || "Server error", 500)
         }
     }
 
@@ -53,15 +63,15 @@ class AuthController {
         const apiResponse = new ApiResponse(res)
         try {
             const user = await authService.getCurrentUser(req.user._id)
-            apiResponse.success(user, "User  retrieved successfully")
+            apiResponse.success(user, "User retrieved successfully")
         } catch (error) {
             console.error("Get current user error:", error)
 
-            if (error.message === "User  not found") {
+            if (error.message.includes("not found")) {
                 return apiResponse.error(error.message, 404)
             }
 
-            apiResponse.error("Server error", 500)
+            return apiResponse.error(error.message || "Server error", 500)
         }
     }
 }

@@ -125,8 +125,35 @@ export const uploadMiddleware = (
                     })
                 )
 
-                // Attach uploaded images to the request body
-                req.body.images = uploadedImages
+                // Process existing images if they exist
+                if (req.body.existingImages) {
+                    try {
+                        // Parse the existingImages JSON string
+                        const existingImages = JSON.parse(
+                            req.body.existingImages
+                        )
+
+                        // Combine existing images with newly uploaded ones
+                        req.body.images = [
+                            ...existingImages,
+                            ...uploadedImages.map((img) => img.url),
+                        ]
+                    } catch (parseError) {
+                        console.error(
+                            "Error parsing existingImages:",
+                            parseError
+                        )
+                        // If parsing fails, just use the uploaded images
+                        req.body.images = uploadedImages.map((img) => img.url)
+                    }
+                } else {
+                    // If no existing images, just use the uploaded ones
+                    req.body.images = uploadedImages.map((img) => img.url)
+                }
+
+                // Remove the existingImages field as it's no longer needed
+                delete req.body.existingImages
+
                 next()
             } catch (uploadError) {
                 console.error("Upload Error:", uploadError)
