@@ -130,7 +130,7 @@ const GamificationProfilePage = () => {
                                         Highest Bid
                                     </p>
                                     <p className="text-xl font-semibold text-amber-700">
-                                        ${profile.stats.highestBid.toFixed(2)}
+                                        ₹{profile.stats.highestBid.toFixed(2)}
                                     </p>
                                 </div>
                             </div>

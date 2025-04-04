@@ -558,7 +558,7 @@ const ProductDetailPage = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className="text-sm font-medium text-gray-900">
-                                                    ${bid.amount.toFixed(2)}
+                                                    ₹{bid.amount.toFixed(2)}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -393,7 +393,7 @@ const DashboardPage = () => {
                                                                             ? `You placed a bid of `
                                                                             : `You listed this item for `}
                                                                         <span className="font-semibold text-primary-600">
-                                                                            $
+                                                                            ₹
                                                                             {isBid
                                                                                 ? item.amount !=
                                                                                       null &&

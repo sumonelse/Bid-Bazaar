@@ -323,12 +323,12 @@ const CreateListingPage = () => {
                                 htmlFor="startingPrice"
                                 className="block text-sm font-medium text-gray-700 mb-1"
                             >
-                                Starting Price ($) *
+                                Starting Price (₹) *
                             </label>
                             <div className="relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <span className="text-gray-500 sm:text-sm">
-                                        $
+                                        ₹
                                     </span>
                                 </div>
                                 <input
@@ -369,7 +369,7 @@ const CreateListingPage = () => {
                                 htmlFor="bidIncrement"
                                 className="block text-sm font-medium text-gray-700 mb-1"
                             >
-                                Minimum Bid Increment ($) *
+                                Minimum Bid Increment (₹) *
                             </label>
                             <div className="relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
