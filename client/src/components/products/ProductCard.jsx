@@ -90,7 +90,7 @@ const ProductCard = ({ product }) => {
                     <div className="flex justify-between items-center mt-auto">
                         <div>
                             <p className="text-primary-600 font-bold text-xl">
-                                $
+                                ₹
                                 {product.currentBid !== undefined &&
                                 product.currentBid !== null
                                     ? product.currentBid.toFixed(2)

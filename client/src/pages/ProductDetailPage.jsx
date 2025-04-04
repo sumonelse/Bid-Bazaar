@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
+import { motion, AnimatePresence } from "framer-motion"
 import { getProductById } from "../api/productService"
 import { getProductBids } from "../api/bidService"
 import { useBidding } from "../context/BidContext"
+import { useAuth } from "../context/AuthContext"
 import BidForm from "../components/bids/BidForm"
+import BidHistory from "../components/bids/BidHistory"
+import BidStatus from "../components/bids/BidStatus"
 import useCountdown from "../hooks/useCountdown"
 import socketService from "../services/socketService"
 import {
@@ -13,6 +17,7 @@ import {
     ArrowPathIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
+    InformationCircleIcon,
 } from "@heroicons/react/24/outline"
 
 const ProductDetailPage = () => {
@@ -22,7 +27,9 @@ const ProductDetailPage = () => {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [activeImage, setActiveImage] = useState(0)
+    const [activeTab, setActiveTab] = useState("details") // details, bids
     const { joinBidRoom, leaveBidRoom, activeBids } = useBidding()
+    const { currentUser } = useAuth()
 
     // Get countdown timer - always call the hook to maintain hook order
     const countdown = useCountdown(product?.endTime || new Date())
@@ -283,48 +290,102 @@ const ProductDetailPage = () => {
                             {product?.title}
                         </h1>
 
-                        {/* Auction info */}
-                        <div className="flex flex-wrap gap-4 mb-4">
-                            <div className="flex items-center text-gray-600">
-                                <ClockIcon className="h-5 w-5 mr-1" />
-                                <span>{formatCountdown()}</span>
-                            </div>
-                            <div className="flex items-center text-gray-600">
-                                <UserIcon className="h-5 w-5 mr-1" />
-                                <span>
-                                    {bidCount} {bidCount === 1 ? "bid" : "bids"}
-                                </span>
-                            </div>
-                            <div className="flex items-center text-gray-600">
-                                <TagIcon className="h-5 w-5 mr-1" />
-                                <Link
-                                    to={`/categories/${product.category?._id}`}
-                                    className="text-primary-600 hover:underline"
-                                >
-                                    {product.category?.name || "Uncategorized"}
-                                </Link>
-                            </div>
+                        {/* Category tag */}
+                        <div className="mb-4">
+                            <Link
+                                to={`/categories/${product.category?._id}`}
+                                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 hover:bg-gray-200 transition-colors"
+                            >
+                                <TagIcon className="h-4 w-4 mr-1" />
+                                {product.category?.name || "Uncategorized"}
+                            </Link>
                         </div>
 
-                        {/* Current bid */}
-                        <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                            <div className="text-sm text-gray-500 mb-1">
-                                Current bid:
-                            </div>
-                            <div className="text-3xl font-bold text-primary-600">
-                                ₹{currentBid?.toFixed(2)}
-                            </div>
-                            <div className="text-sm text-gray-500 mt-1">
-                                Started at ₹
-                                {product.startingPrice?.toFixed(2) || "0.00"}
-                            </div>
-                        </div>
-
-                        {/* Bid form */}
-                        <BidForm
+                        {/* Auction status */}
+                        <BidStatus
                             product={product}
-                            onBidPlaced={handleBidPlaced}
+                            currentBid={currentBid}
+                            bidCount={bidCount}
+                            isEndingSoon={
+                                realtimeBidData?.isEndingSoon ||
+                                (countdownValues.days === 0 &&
+                                    countdownValues.hours < 1)
+                            }
                         />
+
+                        {/* Product description */}
+                        <div className="mb-6">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2 flex items-center">
+                                <InformationCircleIcon className="h-5 w-5 mr-1 text-gray-500" />
+                                Description
+                            </h3>
+                            <div className="bg-gray-50 p-4 rounded-lg prose prose-sm max-w-none">
+                                <p>
+                                    {product.description ||
+                                        "No description provided."}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="mb-4 border-b border-gray-200">
+                            <div className="flex -mb-px">
+                                <button
+                                    className={`mr-8 py-4 px-1 border-b-2 font-medium text-sm ${
+                                        activeTab === "details"
+                                            ? "border-primary-500 text-primary-600"
+                                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                    }`}
+                                    onClick={() => setActiveTab("details")}
+                                >
+                                    Bid Now
+                                </button>
+                                <button
+                                    className={`mr-8 py-4 px-1 border-b-2 font-medium text-sm ${
+                                        activeTab === "bids"
+                                            ? "border-primary-500 text-primary-600"
+                                            : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                    }`}
+                                    onClick={() => setActiveTab("bids")}
+                                >
+                                    Bid History ({bidCount})
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Tab content */}
+                        <div className="mb-6">
+                            <AnimatePresence mode="wait">
+                                {activeTab === "details" ? (
+                                    <motion.div
+                                        key="details"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <BidForm
+                                            product={product}
+                                            onBidPlaced={handleBidPlaced}
+                                        />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="bids"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <BidHistory
+                                            bids={bids}
+                                            currentUserId={currentUser?._id}
+                                            maxHeight="400px"
+                                        />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
 
                         {/* Seller info */}
                         <div className="mt-6 border-t border-gray-200 pt-4">
