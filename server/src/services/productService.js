@@ -62,34 +62,79 @@ class ProductService {
     // Helper method to build product query
     buildProductQuery(filters) {
         const query = {}
-        if (filters.categoryId) query.category = filters.categoryId
-        if (filters.status) query.status = filters.status
-        if (filters.sellerId) query.sellerId = filters.sellerId
-        if (filters.minPrice) query.currentBid = { $gte: filters.minPrice }
-        if (filters.maxPrice) {
-            query.currentBid = {
-                ...query.currentBid,
-                $lte: filters.maxPrice,
+
+        // Handle categories filter (from URL it comes as comma-separated string)
+        if (filters.categories) {
+            const categoryIds =
+                typeof filters.categories === "string"
+                    ? filters.categories.split(",")
+                    : filters.categories
+
+            if (categoryIds.length > 0) {
+                query.category = { $in: categoryIds }
             }
         }
+
+        // Handle single category filter (legacy support)
+        if (filters.categoryId) {
+            query.category = filters.categoryId
+        }
+
+        // Handle status filter
+        if (filters.status) {
+            if (filters.status === "active") {
+                query.status = "live"
+                query.endTime = { $gt: new Date() }
+            } else if (filters.status === "ended") {
+                query.$or = [
+                    { status: "ended" },
+                    {
+                        status: "live",
+                        endTime: { $lte: new Date() },
+                    },
+                ]
+            }
+        }
+
+        // Handle seller filter
+        if (filters.sellerId) {
+            query.sellerId = filters.sellerId
+        }
+
+        // Handle price range filters
+        if (filters.minPrice || filters.maxPrice) {
+            query.currentBid = {}
+
+            if (filters.minPrice) {
+                query.currentBid.$gte = filters.minPrice
+            }
+
+            if (filters.maxPrice) {
+                query.currentBid.$lte = filters.maxPrice
+            }
+        }
+
         // Handle search query
         if (filters.search) {
             query.$text = { $search: filters.search }
         }
+
         return query
     }
 
     // Helper method to determine sort order
     getSortOrder(sortBy) {
         switch (sortBy) {
-            case "endingSoon":
+            case "ending-soon":
                 return { endTime: 1 }
-            case "recentlyAdded":
+            case "newest":
                 return { createdAt: -1 }
-            case "priceAsc":
+            case "price-low":
                 return { currentBid: 1 }
-            case "priceDesc":
+            case "price-high":
                 return { currentBid: -1 }
+            case "popular":
+                return { bidCount: -1 }
             default:
                 return { createdAt: -1 }
         }

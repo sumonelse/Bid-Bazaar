@@ -114,28 +114,9 @@ const AuctionsPage = () => {
                     queryParams.status = filters.status
                 }
 
-                // Map sort options to API parameters
-                switch (filters.sortBy) {
-                    case "ending-soon":
-                        queryParams.sortBy = "endTime"
-                        queryParams.sortOrder = "asc"
-                        break
-                    case "price-low":
-                        queryParams.sortBy = "currentBid"
-                        queryParams.sortOrder = "asc"
-                        break
-                    case "price-high":
-                        queryParams.sortBy = "currentBid"
-                        queryParams.sortOrder = "desc"
-                        break
-                    case "popular":
-                        queryParams.sortBy = "bidCount"
-                        queryParams.sortOrder = "desc"
-                        break
-                    default:
-                        queryParams.sortBy = "createdAt"
-                        queryParams.sortOrder = "desc"
-                }
+                // Pass the sortBy parameter directly to the backend
+                // The backend will handle the mapping to the appropriate sort fields
+                queryParams.sortBy = filters.sortBy
 
                 const data = await getProducts(queryParams)
                 setProducts(data.products || [])

@@ -27,16 +27,40 @@ class ProductController {
     async getProducts(req, res) {
         const apiResponse = new ApiResponse(res)
         try {
-            const { page = 1, limit = 10, ...filters } = req.query
+            const {
+                page = 1,
+                limit = 10,
+                sortBy,
+                sortOrder,
+                search,
+                ...filters
+            } = req.query
 
             // Convert string numbers to actual numbers
             const numericPage = parseInt(page)
             const numericLimit = parseInt(limit)
 
+            // Parse price filters
             if (filters.minPrice)
                 filters.minPrice = parseFloat(filters.minPrice)
             if (filters.maxPrice)
                 filters.maxPrice = parseFloat(filters.maxPrice)
+
+            // Add search parameter if provided
+            if (search) {
+                filters.search = search
+            }
+
+            // Add sort parameters if provided
+            if (sortBy) {
+                filters.sortBy = sortBy
+            }
+
+            if (sortOrder) {
+                filters.sortOrder = sortOrder
+            }
+
+            console.log("Filters received:", filters)
 
             const result = await productService.getProducts(
                 filters,
