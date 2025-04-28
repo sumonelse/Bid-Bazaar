@@ -59,12 +59,12 @@ const Navbar = () => {
                             >
                                 Home
                             </Link>
-                            <Link
+                            {/* <Link
                                 to="/categories"
                                 className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-primary-500 hover:text-gray-700"
                             >
                                 Categories
-                            </Link>
+                            </Link> */}
                             <Link
                                 to="/auctions"
                                 className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-primary-500 hover:text-gray-700"
@@ -232,13 +232,13 @@ const Navbar = () => {
                         >
                             Home
                         </Link>
-                        <Link
+                        {/* <Link
                             to="/categories"
                             className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-primary-50 hover:border-primary-500 hover:text-primary-700 transition-colors"
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Categories
-                        </Link>
+                        </Link> */}
                         <Link
                             to="/auctions"
                             className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-gray-600 hover:bg-primary-50 hover:border-primary-500 hover:text-primary-700 transition-colors"

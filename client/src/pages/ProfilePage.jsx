@@ -641,7 +641,7 @@ const ProfilePage = () => {
                                                                     ? `You placed a bid of `
                                                                     : `You listed this item for `}
                                                                 <span className="font-semibold text-primary-600">
-                                                                    $
+                                                                    ₹
                                                                     {isBid
                                                                         ? item.amount !=
                                                                               null &&
@@ -773,7 +773,7 @@ const ProfilePage = () => {
                                                                 <p className="text-sm text-gray-500">
                                                                     Current bid:{" "}
                                                                     <span className="font-medium">
-                                                                        $
+                                                                        ₹
                                                                         {(product.currentBid !=
                                                                             null &&
                                                                         !isNaN(
